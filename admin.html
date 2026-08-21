@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Lab Console — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#05070a;--bg2:#080c12;--panel:#101820ee;--solid:#101820;--line:#1c2836;--text:#e8eef5;--mute:#8b9bb4;--cyan:#00e5ff;--pcb:#22c55e;--violet:#8b5cf6;--amber:#ff9100;--danger:#ff4d6d;--grid:rgba(0,229,255,.045);--glow:rgba(0,229,255,.28);--display:Rajdhani,Inter,sans-serif;--mono:"Share Tech Mono",ui-monospace,monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow-x:hidden}
+a{color:var(--cyan);text-decoration:none}button,input,textarea,select{font:inherit;color:inherit}
+.tech{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.display{font-family:var(--display)}
+.glass{background:var(--panel);backdrop-filter:blur(16px);border:1px solid var(--line)}
+.lab-grid{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:48px 48px}
+.led{display:inline-block;width:8px;height:8px;border-radius:99px;background:var(--pcb);box-shadow:0 0 10px var(--pcb);animation:blink 2.4s ease-in-out infinite;vertical-align:middle}
+@keyframes blink{50%{opacity:.35}}@keyframes dashflow{to{stroke-dashoffset:-240}}@keyframes scan-sweep{0%{transform:translateY(-120%);opacity:0}12%{opacity:.7}100%{transform:translateY(220%);opacity:0}}@keyframes caret{0%,45%{opacity:1}50%,100%{opacity:0}}@keyframes voltage{0%,100%{opacity:.55}40%{opacity:1}}@keyframes float-drift{50%{transform:translate3d(6px,-10px,0)}}
+.caret{display:inline-block;width:.55ch;height:.85em;margin-left:2px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:caret 1s steps(1) infinite;vertical-align:-.08em}
+.live{animation:voltage 1.8s ease-in-out infinite}
+.scan-sweep{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.scan-sweep:after{content:"";position:absolute;left:0;right:0;height:28%;background:linear-gradient(to bottom,transparent,rgba(0,229,255,.22),transparent);animation:scan-sweep 5.8s ease-in-out infinite}
+nav.top{position:fixed;top:12px;left:12px;right:12px;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;max-width:1152px;margin:0 auto}
+.nav-links{display:flex;flex-wrap:wrap;gap:4px}
+.nav-links a,.nav-links button{background:none;border:0;cursor:pointer;color:var(--mute);font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:6px 10px}
+.nav-links a:hover,.nav-links button:hover,.nav-links a.active{color:var(--cyan)}
+.logo{display:flex;align-items:center;gap:10px;background:none;border:0;color:inherit;cursor:pointer}
+.logo-mark{width:32px;height:32px;display:grid;place-items:center;border:1px solid rgba(0,229,255,.4);color:var(--cyan);font-family:var(--display)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border:1px solid var(--line);background:transparent;color:var(--text);font-family:var(--display);font-size:13px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.btn.p{background:var(--cyan);color:#05070a;border-color:var(--cyan)}
+.chip{border:1px solid var(--line);padding:4px 8px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
+.wrap{max-width:1152px;margin:0 auto;padding:0 20px}
+section.block{padding:96px 0;position:relative}
+h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:.04em}
+h1{font-size:clamp(36px,7vw,72px);line-height:.95;margin:8px 0}
+h2{font-size:clamp(28px,5vw,48px);margin:8px 0 16px}
+.hero{min-height:100vh;padding:120px 0 64px;position:relative;overflow:hidden}
+.hero-grid{display:grid;gap:40px;align-items:center}
+@media(min-width:960px){.hero-grid{grid-template-columns:1.05fr .95fr}}
+.pcb{position:relative;aspect-ratio:4/3;border:1px solid var(--line);background:#080c12cc;overflow:hidden}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:28px}
+@media(min-width:640px){.meta{grid-template-columns:repeat(4,1fr)}}
+.meta div{border:1px solid var(--line);padding:10px 12px}
+.cards{display:grid;gap:12px}
+@media(min-width:640px){.cards{grid-template-columns:1fr 1fr}}@media(min-width:960px){.cards.three{grid-template-columns:1fr 1fr 1fr}}
+.card{border:1px solid var(--line);background:var(--solid);padding:0;overflow:hidden;display:flex;flex-direction:column}
+.card .body{padding:16px}
+.card img{width:100%;height:180px;object-fit:cover;background:#0b1220;display:block}
+.stat{font-family:var(--display);font-size:36px;color:var(--cyan)}
+.bar{height:4px;background:var(--line);overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--pcb),var(--cyan))}
+.modal{position:fixed;inset:0;background:#05070acc;backdrop-filter:blur(10px);z-index:70;overflow:auto;padding:24px;display:none}
+.modal.on{display:block}
+.modal .box{max-width:860px;margin:24px auto;background:var(--solid);border:1px solid var(--line)}
+.splash{position:fixed;inset:0;z-index:90;background:var(--bg);display:flex;flex-direction:column;justify-content:space-between;padding:32px}
+.hidden{display:none !important}
+.field{width:100%;margin:6px 0 14px;padding:10px;background:#05070a66;border:1px solid var(--line)}
+aside.side{background:var(--bg2);border-right:1px solid var(--line);min-height:100vh;display:flex;flex-direction:column}
+aside.side a,aside.side button{display:block;width:100%;text-align:left;background:none;border:0;padding:10px 16px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);cursor:pointer}
+aside.side a.on,aside.side button.on,aside.side a:hover{color:var(--cyan);background:rgba(0,229,255,.08)}
+.admin{display:grid;min-height:100vh}
+@media(min-width:960px){.admin{grid-template-columns:240px 1fr}}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:#05070acc;position:sticky;top:0}
+.float-lab{position:absolute;z-index:2;border:1px solid var(--line);background:#05070acc;padding:3px 8px;font-family:var(--mono);font-size:9px;letter-spacing:.16em;animation:float-drift 7s ease-in-out infinite}
+footer.ft{border-top:1px solid var(--line);background:var(--bg2);padding:40px 20px}
+.msg{font-family:var(--mono);font-size:12px;color:var(--pcb)}.msg.bad{color:var(--danger)}
+[data-theme="light"]{--bg:#eef3f8;--bg2:#e4ebf3;--panel:#ffffffee;--solid:#ffffff;--line:#c9d5e3;--text:#0c1520;--mute:#4a5d73;--cyan:#007f92;--pcb:#0d8a42;--violet:#5b37c7;--amber:#c05600;--danger:#c81e45;--grid:rgba(12,40,70,.05);--glow:rgba(0,127,146,.18)}
+.theme-btn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);background:transparent;color:var(--mute);cursor:pointer;position:relative;overflow:hidden}
+.theme-btn svg{position:absolute;width:16px;height:16px;transition:transform .45s cubic-bezier(.22,1,.36,1),opacity .3s}
+.theme-btn .ico-sun{opacity:1;transform:none}.theme-btn .ico-moon{opacity:0;transform:rotate(90deg) scale(.4)}
+[data-theme="light"] .theme-btn .ico-sun{opacity:0;transform:rotate(-90deg) scale(.4)}
+[data-theme="light"] .theme-btn .ico-moon{opacity:1;transform:none}
+.btn.p{color:var(--bg)}
+.field{background:color-mix(in srgb,var(--bg) 40%,transparent)}
+.topbar{background:color-mix(in srgb,var(--bg) 80%,transparent)}
+#theme-wipe{position:fixed;inset:0;z-index:120;pointer-events:none;opacity:0}
+#theme-wipe.go{opacity:1;animation:themeWipe .5s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes themeWipe{from{clip-path:circle(0 at var(--x) var(--y))}to{clip-path:circle(150vmax at var(--x) var(--y))}}
+
+.save-toast{position:fixed;bottom:20px;right:20px;z-index:80;padding:10px 14px;display:none}
+.save-toast.on{display:block}
+.topbar .btn{padding:8px 16px;font-size:12px}#save-btn{min-width:88px}
+ body{padding:0}</style>
+</head>
+<body>
+<div id="theme-wipe"></div>
+<div id="login" class="lab-grid" style="min-height:100vh;display:grid;place-items:center;padding:24px;position:relative">
+  <div class="scan-sweep"></div>
+  <form class="glass" style="width:min(440px,100%);padding:32px;position:relative;z-index:1" onsubmit="return doLogin(event)">
+    <div style="display:flex;justify-content:space-between;align-items:center"><p class="tech" style="color:var(--cyan);margin:0">SECURE UPLINK</p><button class="theme-btn" type="button" aria-label="Toggle theme" onclick="toggleTheme(event)">
+      <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3 7 7 0 0 0 21 14.5z"/></svg>
+    </button></div>
+    <h1 class="display" style="font-size:32px;letter-spacing:.14em">LAB ACCESS</h1>
+    <p style="color:var(--mute);font-size:14px">Authenticate to manage the portfolio database.</p>
+    <p class="tech">USERNAME</p><input class="field" id="u" value="admin" autocomplete="username"/>
+    <p class="tech">PASSWORD</p><input class="field" id="pw" type="password" autocomplete="current-password"/>
+    <p class="msg bad" id="le"></p>
+    <button class="btn p" style="width:100%;justify-content:center" type="submit">UNLOCK CONSOLE</button>
+    <canvas id="login-scope" style="width:100%;height:48px;margin-top:16px;opacity:.75"></canvas>
+    <p style="text-align:center;margin-top:16px"><a class="tech" href="index.html">← BACK TO PORTFOLIO</a></p>
+  </form>
+</div>
+<div id="app" class="admin hidden">
+  <aside class="side">
+    <div style="padding:16px;border-bottom:1px solid var(--line)"><p class="display" style="letter-spacing:.16em">LAB CONSOLE</p><p class="tech">OPERATOR · admin</p></div>
+    <button class="on" data-v="dash" onclick="page('dash')">Dashboard</button>
+    <button data-v="projects" onclick="page('projects')">Projects</button>
+    <button data-v="achievements" onclick="page('achievements')">Achievements</button>
+    <button data-v="skills" onclick="page('skills')">Skills</button>
+    <button data-v="messages" onclick="page('messages')">Messages</button>
+    <button data-v="settings" onclick="page('settings')">Settings</button>
+    <button data-v="data" onclick="page('data')">Publish data</button>
+    <button style="margin-top:auto;border-top:1px solid var(--line);color:var(--danger)" onclick="logout()">SIGN OUT</button>
+  </aside>
+  <div>
+    <div class="topbar"><span class="tech" style="color:var(--pcb)"><span class="led"></span> SYSTEM ONLINE</span><span style="display:flex;align-items:center;gap:10px"><button class="theme-btn" type="button" aria-label="Toggle theme" onclick="toggleTheme(event)">
+      <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3 7 7 0 0 0 21 14.5z"/></svg>
+    </button><button class="btn p" type="button" onclick="saveNow()" id="save-btn">SAVE</button><span class="tech" id="save-status">STORAGE READY</span><a class="tech" href="index.html">VIEW PORTFOLIO →</a></span></div>
+    <main style="padding:24px" id="main"></main>
+  </div>
+</div>
+<div class="modal" id="modal"></div>
+<div class="glass save-toast" id="save-toast">SAVED ✓</div>
+<script type="application/json" id="SEED">{
+  "profile": {
+    "name": "Aditya Varma",
+    "title": "ECE Engineer",
+    "headline": "BUILDING THE FUTURE\nONE CIRCUIT AT A TIME.",
+    "tagline": "Embedded systems · IoT · hardware-software co-design",
+    "bio": "Electronics and Communication engineer who treats every board like a story — power rails, signal integrity, firmware, and the interface a human actually touches. I design, prototype, and ship systems that live between silicon and the physical world.",
+    "longBio": "I work at the intersection of analog sensing, embedded firmware, and product software. From ESP32 field nodes to Raspberry Pi vision stacks, I care about clean schematics, stable power, readable C, and interfaces that feel inevitable. Currently focused on low-power IoT, PCB-first product design, and systems that can survive outside a lab bench.",
+    "branch": "Electronics & Communication Engineering",
+    "education": "B.Tech ECE · VRSEC, Vijayawada",
+    "educationDetail": "Velagapudi Ramakrishna Siddhartha Engineering College",
+    "location": "Vijayawada, Andhra Pradesh",
+    "focus": "Embedded Systems",
+    "interest": "IoT · PCB Design · Signal Processing",
+    "experience": "Internships · Hardware builds · Research projects",
+    "status": "Building",
+    "availability": "Open to internships & collaborations",
+    "email": "aditya.varma@example.com",
+    "phone": "+91 98765 43210",
+    "github": "https://github.com/adityavarma",
+    "linkedin": "https://linkedin.com/in/adityavarma",
+    "instagram": "https://instagram.com/aditya.circuits",
+    "resumeUrl": "/resume.html",
+    "image": "/images/profile.jpg",
+    "stats": {
+      "projects": 12,
+      "technologies": 18,
+      "hardware": 8,
+      "achievements": 6
+    }
+  },
+  "settings": {
+    "siteTitle": "Aditya Varma — ECE Engineer",
+    "siteDescription": "Portfolio of Aditya Varma, Electronics & Communication engineer building embedded systems, IoT products, and hardware-software platforms.",
+    "lastUpdated": "2026-08-19"
+  },
+  "stats": {
+    "views": 1284
+  },
+  "projects": [
+    {
+      "id": "p1",
+      "title": "Smart Energy Monitor",
+      "description": "IoT energy monitor that streams voltage, current, and watt-hours to a live dashboard.",
+      "fullDescription": "A production-minded energy monitor built around ESP32 and a non-invasive CT sensor. The analog front-end is conditioned, sampled, and calibrated against a reference meter.",
+      "problem": "Hostel and lab spaces had no cheap, trustworthy way to see real-time consumption.",
+      "solution": "A clamp-on CT + voltage sense PCB with calibrated firmware and a cloud dashboard.",
+      "category": "IoT",
+      "technologies": [
+        "ESP32",
+        "C++",
+        "MQTT",
+        "Sensors",
+        "KiCad"
+      ],
+      "hardware": [
+        "ESP32-WROOM",
+        "SCT-013 CT",
+        "OLED"
+      ],
+      "features": [
+        "Real-time V/I/P",
+        "kWh accumulation",
+        "MQTT telemetry"
+      ],
+      "image": "/images/projects/energy-monitor.jpg",
+      "liveUrl": "https://energy.adityavarma.dev",
+      "demoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "githubUrl": "https://github.com/adityavarma/smart-energy-monitor",
+      "featured": true,
+      "status": "Completed",
+      "date": "2025-11",
+      "order": 1
+    },
+    {
+      "id": "p2",
+      "title": "IoT Home Automation",
+      "description": "Relay-based apartment automation with scenes, schedules, and a local-first control plane.",
+      "fullDescription": "A home automation hub that prefers the LAN. ESP32 firmware drives relays and sensors.",
+      "problem": "Cloud-only smart switches fail when the uplink dies.",
+      "solution": "Local MQTT broker, latching relays, and a LAN dashboard.",
+      "category": "IoT",
+      "technologies": [
+        "ESP32",
+        "MQTT",
+        "React",
+        "Node.js"
+      ],
+      "hardware": [
+        "ESP32",
+        "4-ch relay",
+        "DHT22"
+      ],
+      "features": [
+        "Room scenes",
+        "Schedules",
+        "Local-first"
+      ],
+      "image": "/images/projects/home-automation.jpg",
+      "liveUrl": "",
+      "demoUrl": "",
+      "githubUrl": "https://github.com/adityavarma/iot-home-hub",
+      "featured": true,
+      "status": "Completed",
+      "date": "2025-08",
+      "order": 2
+    },
+    {
+      "id": "p3",
+      "title": "ESP32 Weather Station",
+      "description": "Solar-assisted outdoor node logging temperature, humidity, pressure, and light.",
+      "fullDescription": "A weather node designed to live outside a lab with deep-sleep firmware and solar trickle charge.",
+      "problem": "Campus microclimate data was anecdotal.",
+      "solution": "Low-power ESP32 node and a ventilated enclosure.",
+      "category": "Embedded",
+      "technologies": [
+        "ESP32",
+        "C",
+        "Sensors",
+        "KiCad"
+      ],
+      "hardware": [
+        "ESP32",
+        "BME280",
+        "BH1750"
+      ],
+      "features": [
+        "Deep sleep",
+        "Solar assist",
+        "OLED readout"
+      ],
+      "image": "/images/projects/weather-station.jpg",
+      "liveUrl": "",
+      "demoUrl": "https://vimeo.com/148751763",
+      "githubUrl": "https://github.com/adityavarma/esp32-weather",
+      "featured": false,
+      "status": "Completed",
+      "date": "2025-06",
+      "order": 3
+    },
+    {
+      "id": "p4",
+      "title": "Smart Attendance System",
+      "description": "RFID attendance with anti-proxy rules, CSV export, and a faculty console.",
+      "fullDescription": "MFRC522 + ESP32 attendance kiosk that writes logs locally and syncs when the network is up.",
+      "problem": "Paper attendance was trivial to spoof.",
+      "solution": "Card tap, timestamped logs, and an offline queue.",
+      "category": "Embedded",
+      "technologies": [
+        "ESP32",
+        "RFID",
+        "C++"
+      ],
+      "hardware": [
+        "ESP32",
+        "MFRC522",
+        "LCD"
+      ],
+      "features": [
+        "RFID tap",
+        "Anti-proxy window",
+        "CSV export"
+      ],
+      "image": "/images/projects/attendance.jpg",
+      "liveUrl": "",
+      "demoUrl": "",
+      "githubUrl": "https://github.com/adityavarma/smart-attendance",
+      "featured": false,
+      "status": "Completed",
+      "date": "2025-03",
+      "order": 4
+    },
+    {
+      "id": "p5",
+      "title": "Line Following Robot",
+      "description": "PID line follower with a calibrated IR array and tunable control from a serial console.",
+      "fullDescription": "A compact differential-drive robot that treats line following as a control problem.",
+      "problem": "Most campus line-followers oscillate on tight radii.",
+      "solution": "Calibrated sensor map and velocity-limited PID.",
+      "category": "Robotics",
+      "technologies": [
+        "Arduino",
+        "C++",
+        "PID",
+        "Sensors"
+      ],
+      "hardware": [
+        "Arduino Nano",
+        "IR array",
+        "N20 motors"
+      ],
+      "features": [
+        "PID control",
+        "Sensor calibration",
+        "Serial telemetry"
+      ],
+      "image": "/images/projects/line-follower.jpg",
+      "liveUrl": "",
+      "demoUrl": "",
+      "githubUrl": "https://github.com/adityavarma/line-follower",
+      "featured": false,
+      "status": "Completed",
+      "date": "2024-12",
+      "order": 5
+    },
+    {
+      "id": "p6",
+      "title": "Palm Vein Scanner",
+      "description": "Near-infrared palm-vein capture rig exploring contactless biometric authentication.",
+      "fullDescription": "A research prototype that illuminates the palm with NIR LEDs and captures vein patterns.",
+      "problem": "Fingerprint kiosks fail with dust and hygiene concerns.",
+      "solution": "Contactless NIR imaging and a vein-contrast pipeline.",
+      "category": "AI",
+      "technologies": [
+        "Raspberry Pi",
+        "Python",
+        "OpenCV"
+      ],
+      "hardware": [
+        "Raspberry Pi 4",
+        "NoIR camera",
+        "850nm LEDs"
+      ],
+      "features": [
+        "NIR illumination",
+        "Palm guidance",
+        "Template match"
+      ],
+      "image": "/images/projects/palm-vein.jpg",
+      "liveUrl": "",
+      "demoUrl": "",
+      "githubUrl": "https://github.com/adityavarma/palm-vein",
+      "featured": true,
+      "status": "In Progress",
+      "date": "2026-04",
+      "order": 6
+    },
+    {
+      "id": "p7",
+      "title": "Digital Power Meter",
+      "description": "True-RMS-leaning bench meter for 230V rails with isolated sense and OLED UI.",
+      "fullDescription": "A student-safe power meter with isolated voltage sensing and hall-effect current.",
+      "problem": "Department benches lacked a readable digital wattmeter.",
+      "solution": "Isolated analog front-end and a three-page OLED UI.",
+      "category": "EEE",
+      "technologies": [
+        "STM32",
+        "C",
+        "Analog",
+        "KiCad"
+      ],
+      "hardware": [
+        "STM32F103",
+        "ACS712",
+        "OLED"
+      ],
+      "features": [
+        "V/I/P display",
+        "Energy tally",
+        "Isolation"
+      ],
+      "image": "/images/projects/power-meter.jpg",
+      "liveUrl": "",
+      "demoUrl": "",
+      "githubUrl": "https://github.com/adityavarma/digital-power-meter",
+      "featured": false,
+      "status": "Completed",
+      "date": "2025-01",
+      "order": 7
+    },
+    {
+      "id": "p8",
+      "title": "AI Object Detection System",
+      "description": "Edge vision stack on Raspberry Pi with live bounding boxes for lab safety checks.",
+      "fullDescription": "A compact vision node that runs a quantized detector for PPE and restricted-zone intrusion.",
+      "problem": "Open lab hours needed a lightweight PPE check without a cloud GPU.",
+      "solution": "Pi + camera + quantized model with a status beacon.",
+      "category": "AI",
+      "technologies": [
+        "Raspberry Pi",
+        "Python",
+        "OpenCV",
+        "TensorFlow Lite"
+      ],
+      "hardware": [
+        "Raspberry Pi 4",
+        "Pi Camera",
+        "HDMI display"
+      ],
+      "features": [
+        "On-device inference",
+        "Live boxes",
+        "Event log"
+      ],
+      "image": "/images/projects/object-detection.jpg",
+      "liveUrl": "",
+      "demoUrl": "https://www.youtube.com/watch?v=aircAruvnKk",
+      "githubUrl": "https://github.com/adityavarma/edge-detect",
+      "featured": true,
+      "status": "Completed",
+      "date": "2026-02",
+      "order": 8
+    },
+    {
+      "id": "p9",
+      "title": "PCB Sensor Network",
+      "description": "Mesh of identical sensor nodes sharing temperature, light, and battery over ESP-NOW.",
+      "fullDescription": "A family of postage-stamp PCBs that wake, sample, and gossip state over ESP-NOW.",
+      "problem": "Breadboard wireless demos never survived more than an afternoon.",
+      "solution": "A single 2-layer node PCB and a simple send window.",
+      "category": "Hardware",
+      "technologies": [
+        "ESP32",
+        "ESP-NOW",
+        "KiCad",
+        "C"
+      ],
+      "hardware": [
+        "ESP32-C3",
+        "SHT30",
+        "Custom PCB"
+      ],
+      "features": [
+        "ESP-NOW mesh",
+        "Battery telemetry",
+        "Fab-ready gerbers"
+      ],
+      "image": "/images/projects/sensor-network.jpg",
+      "liveUrl": "",
+      "demoUrl": "",
+      "githubUrl": "https://github.com/adityavarma/pcb-sensor-net",
+      "featured": false,
+      "status": "Completed",
+      "date": "2025-09",
+      "order": 9
+    },
+    {
+      "id": "p10",
+      "title": "Smart Agriculture System",
+      "description": "Soil-aware irrigation controller with moisture probes, pump logic, and solar headroom.",
+      "fullDescription": "A field controller that waters only when the root zone asks.",
+      "problem": "Manual watering over-saturated seedlings.",
+      "solution": "Multi-point moisture sensing and time-bounded pump runs.",
+      "category": "IoT",
+      "technologies": [
+        "ESP32",
+        "C++",
+        "Sensors",
+        "Relays"
+      ],
+      "hardware": [
+        "ESP32",
+        "Soil probes",
+        "Pump"
+      ],
+      "features": [
+        "Multi-zone moisture",
+        "Pump interlock",
+        "Solar headroom"
+      ],
+      "image": "/images/projects/agriculture.jpg",
+      "liveUrl": "",
+      "demoUrl": "",
+      "githubUrl": "https://github.com/adityavarma/smart-agri",
+      "featured": false,
+      "status": "Completed",
+      "date": "2024-10",
+      "order": 10
+    }
+  ],
+  "achievements": [
+    {
+      "id": "a1",
+      "title": "Smart India Hackathon — Finalist",
+      "organization": "SIH / MoE",
+      "description": "National finalist for an IoT civic-utility prototype that monitored community water pumps.",
+      "date": "2025-12",
+      "category": "Hackathon",
+      "order": 1
+    },
+    {
+      "id": "a2",
+      "title": "Embedded System Design — Elite",
+      "organization": "NPTEL",
+      "description": "Elite certification covering MCU architecture, interfacing, and firmware structure.",
+      "date": "2025-10",
+      "category": "Certification",
+      "order": 2
+    },
+    {
+      "id": "a3",
+      "title": "Embedded Intern",
+      "organization": "CircuitForge Labs, Hyderabad",
+      "description": "Eight-week internship on sensor bring-up and field firmware for an industrial telemetry node.",
+      "date": "2025-06",
+      "category": "Internship",
+      "order": 3
+    },
+    {
+      "id": "a4",
+      "title": "Best Hardware Build",
+      "organization": "VRSEC Project Expo",
+      "description": "Department award for the Smart Energy Monitor — cited for calibration rigor.",
+      "date": "2025-03",
+      "category": "Award",
+      "order": 4
+    },
+    {
+      "id": "a5",
+      "title": "Advanced PCB Design Workshop",
+      "organization": "IEEE Student Branch",
+      "description": "Hands-on four-layer workshop: stack-ups, return paths, and DFM checks.",
+      "date": "2024-11",
+      "category": "Workshop",
+      "order": 5
+    },
+    {
+      "id": "a6",
+      "title": "IEEE Student Paper",
+      "organization": "IEEE HYDCON Student Track",
+      "description": "Presented a short paper on low-cost NIR palm-vein capture for lab access control.",
+      "date": "2026-02",
+      "category": "Academic",
+      "order": 6
+    }
+  ],
+  "skills": [
+    {
+      "id": "s1",
+      "name": "Arduino",
+      "category": "Hardware",
+      "level": 92,
+      "description": "Rapid prototyping, shields, sensor integration, and production-minded sketches."
+    },
+    {
+      "id": "s2",
+      "name": "ESP32",
+      "category": "Hardware",
+      "level": 90,
+      "description": "Wi-Fi/BLE firmware, FreeRTOS tasks, low-power modes, and field telemetry."
+    },
+    {
+      "id": "s3",
+      "name": "Raspberry Pi",
+      "category": "Hardware",
+      "level": 84,
+      "description": "Edge compute, camera pipelines, Linux services, and gateway nodes."
+    },
+    {
+      "id": "s4",
+      "name": "Sensors",
+      "category": "Hardware",
+      "level": 88,
+      "description": "Analog front-ends, calibration, filtering, and noisy real-world signals."
+    },
+    {
+      "id": "s5",
+      "name": "Microcontrollers",
+      "category": "Hardware",
+      "level": 86,
+      "description": "AVR, ARM Cortex-M, timers, DMA, interrupts, and bare-metal bring-up."
+    },
+    {
+      "id": "s6",
+      "name": "PCB Design",
+      "category": "Hardware",
+      "level": 80,
+      "description": "KiCad schematics, 2–4 layer layouts, DRC, and manufacturable gerbers."
+    },
+    {
+      "id": "s7",
+      "name": "Embedded Systems",
+      "category": "Hardware",
+      "level": 91,
+      "description": "Firmware architecture, drivers, RTOS, and hardware-software contracts."
+    },
+    {
+      "id": "s8",
+      "name": "Analog Electronics",
+      "category": "Electronics",
+      "level": 82,
+      "description": "Op-amps, filters, ADC conditioning, and measurement circuits."
+    },
+    {
+      "id": "s9",
+      "name": "Digital Electronics",
+      "category": "Electronics",
+      "level": 88,
+      "description": "FSM design, timing, logic, and microcontroller interfacing."
+    },
+    {
+      "id": "s10",
+      "name": "Communication Systems",
+      "category": "Electronics",
+      "level": 76,
+      "description": "Modulation basics, RF links, UART/SPI/I2C, and protocol stacks."
+    },
+    {
+      "id": "s11",
+      "name": "Circuit Design",
+      "category": "Electronics",
+      "level": 85,
+      "description": "From napkin schematic to stable, testable, documented boards."
+    },
+    {
+      "id": "s12",
+      "name": "Power Electronics",
+      "category": "Electronics",
+      "level": 74,
+      "description": "SMPS basics, battery management, and efficient 3.3/5V rails."
+    },
+    {
+      "id": "s13",
+      "name": "Signal Processing",
+      "category": "Electronics",
+      "level": 78,
+      "description": "Filtering, FFT intuition, sensor fusion, and noise rejection."
+    },
+    {
+      "id": "s14",
+      "name": "C",
+      "category": "Software",
+      "level": 90,
+      "description": "Embedded C, drivers, memory-aware firmware, and portable HAL layers."
+    },
+    {
+      "id": "s15",
+      "name": "C++",
+      "category": "Software",
+      "level": 82,
+      "description": "Arduino/ESP abstractions, lightweight classes, and robotics firmware."
+    },
+    {
+      "id": "s16",
+      "name": "Python",
+      "category": "Software",
+      "level": 86,
+      "description": "Test harnesses, data logging, ML inference, and lab automation."
+    },
+    {
+      "id": "s17",
+      "name": "JavaScript",
+      "category": "Software",
+      "level": 80,
+      "description": "Dashboards, device UIs, and tooling around hardware products."
+    },
+    {
+      "id": "s18",
+      "name": "React",
+      "category": "Software",
+      "level": 78,
+      "description": "Operator consoles, telemetry dashboards, and portfolio-grade interfaces."
+    },
+    {
+      "id": "s19",
+      "name": "Node.js",
+      "category": "Software",
+      "level": 74,
+      "description": "Device APIs, MQTT bridges, and lightweight backend services."
+    },
+    {
+      "id": "s20",
+      "name": "Arduino IDE",
+      "category": "Tools",
+      "level": 93,
+      "description": "Daily driver for bring-up, libraries, and classroom-to-field prototypes."
+    },
+    {
+      "id": "s21",
+      "name": "KiCad",
+      "category": "Tools",
+      "level": 81,
+      "description": "Schematic capture, footprint hygiene, and fab-ready PCB output."
+    },
+    {
+      "id": "s22",
+      "name": "Proteus",
+      "category": "Tools",
+      "level": 77,
+      "description": "Circuit simulation and firmware-in-the-loop before copper is cut."
+    },
+    {
+      "id": "s23",
+      "name": "MATLAB",
+      "category": "Tools",
+      "level": 72,
+      "description": "Signal analysis, control sketches, and academic DSP workflows."
+    },
+    {
+      "id": "s24",
+      "name": "Git",
+      "category": "Tools",
+      "level": 84,
+      "description": "Versioned firmware, gerbers, and documentation that survive handoff."
+    },
+    {
+      "id": "s25",
+      "name": "GitHub",
+      "category": "Tools",
+      "level": 85,
+      "description": "Open hardware notes, issue-driven builds, and clean public repos."
+    }
+  ]
+}</script>
+<script>
+
+function applyTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('ece_theme',t)}catch(e){}}
+(function(){try{applyTheme(localStorage.getItem('ece_theme')||'dark')}catch(e){applyTheme('dark')}})();
+function toggleTheme(ev){
+  const next=document.documentElement.dataset.theme==='light'?'dark':'light';
+  const wipe=document.getElementById('theme-wipe');
+  if(!wipe||matchMedia('(prefers-reduced-motion: reduce)').matches){applyTheme(next);return}
+  const x=(ev&&ev.clientX)||innerWidth-48, y=(ev&&ev.clientY)||24;
+  wipe.style.setProperty('--x',x+'px'); wipe.style.setProperty('--y',y+'px');
+  wipe.style.background=next==='light'?'#eef3f8':'#05070a';
+  wipe.classList.remove('go'); void wipe.offsetWidth; wipe.classList.add('go');
+  setTimeout(function(){applyTheme(next);setTimeout(function(){wipe.classList.remove('go')},80)},280);
+}
+
+const KEY='ece_lab_db_v1', SAFETY='ece_lab_db_v1_safety', AUTH='ece_auth';
+const SECRET=/password|token|secret|apiKey|privateKey|accessToken|refreshToken|passwordHash|adminPassword/i;
+const PUB=['profile','settings','stats','projects','achievements','skills'];
+let DB=null;
+function seed(){try{return JSON.parse(document.getElementById('SEED').textContent)}catch(e){return {profile:{},settings:{},stats:{},projects:[],achievements:[],skills:[],messages:[]}}}
+function strip(v){if(Array.isArray(v))return v.map(strip);if(v&&typeof v==='object'){const o={};Object.keys(v).forEach(k=>{if(!SECRET.test(k)&&k!=='admin')o[k]=strip(v[k])});return o}return v}
+function load(){
+  try{
+    const r=localStorage.getItem(KEY);
+    if(r){
+      const parsed=JSON.parse(r);
+      DB=Object.assign({messages:[]},seed(),parsed);
+      ['profile','settings','stats','projects','achievements','skills','messages'].forEach(k=>{ if(parsed[k]!==undefined) DB[k]=parsed[k]; });
+      return true;
+    }
+  }catch(e){}
+  DB=Object.assign({messages:[]},seed());
+  return false;
+}
+function save(opt){
+  try{
+    if(!DB.settings) DB.settings={};
+    if(!opt||opt.stamp!==false) DB.settings.lastUpdated=new Date().toISOString().slice(0,10);
+    const payload=JSON.stringify(DB);
+    localStorage.setItem(KEY,payload);
+    localStorage.setItem('ece_lab_dirty','1');
+    const ok=localStorage.getItem(KEY)===payload;
+    if(!opt||opt.quiet!==true) pingSaved(ok);
+    return ok;
+  }catch(e){ pingSaved(false); return false; }
+}
+function pingSaved(ok){
+  const t=document.getElementById('save-toast'), s=document.getElementById('save-status');
+  const msg=ok===false?'SAVE FAILED':'SAVED ✓  Refresh will keep this.';
+  if(t){ t.textContent=msg; t.classList.add('on'); t.style.color=ok===false?'var(--danger)':'var(--pcb)'; clearTimeout(pingSaved._tm); pingSaved._tm=setTimeout(()=>t.classList.remove('on'),2200); }
+  if(s) s.textContent=ok===false?'SAVE FAILED':'SAVED · '+new Date().toLocaleTimeString();
+}
+function harvestForms(){
+  const f=document.querySelector('#main form');
+  if(f && f.elements && f.elements.headline){
+    const g=k=>f.elements[k]?f.elements[k].value:'';
+    DB.profile=Object.assign({},DB.profile,{
+      name:g('name'), title:g('title'), branch:g('branch'), focus:g('focus'), location:g('location'),
+      email:g('email'), phone:g('phone'), github:g('github'), linkedin:g('linkedin'),
+      headline:g('headline'), bio:g('bio')
+    });
+  }
+  const mf=document.querySelector('#modal.on form')||document.querySelector('#modal form');
+  if(mf && mf.elements && mf.elements.title && document.getElementById('modal').classList.contains('on')){
+    const id=(mf.getAttribute('onsubmit')||'').match(/saveProj\(event,'([^']*)'\)/);
+    const pid=id?id[1]:'';
+    const tech=String(mf.elements.technologies?mf.elements.technologies.value:'').split(',').map(s=>s.trim()).filter(Boolean);
+    const g=k=>mf.elements[k]?mf.elements[k].value:''; const patch={title:g('title'),description:g('description'),category:g('category'),technologies:tech,status:g('status'),liveUrl:g('liveUrl'),githubUrl:g('githubUrl'),demoUrl:g('demoUrl')};
+    if(pid){ const i=(DB.projects||[]).findIndex(p=>p.id===pid); if(i>=0) DB.projects[i]=Object.assign({},DB.projects[i],patch); }
+    else { /* don't auto-create from harvest */ }
+  }
+}
+function saveNow(){
+  harvestForms();
+  const ok=save();
+  const s=document.getElementById('save-status');
+  if(s) s.textContent=ok?('SAVED · '+new Date().toLocaleTimeString()):'SAVE FAILED';
+  return ok;
+}
+function safety(){try{const c=localStorage.getItem(KEY);if(c)localStorage.setItem(SAFETY,c)}catch(e){}}
+function img(s){if(!s)return '';s=String(s);if(/^https?:|data:/.test(s))return s;return s.replace(/^\//,'')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function uid(){return 'id-'+Date.now()+'-'+Math.floor(Math.random()*1e6)}
+function pick(keys){const s=strip(DB),o={};keys.forEach(k=>{if(s[k]!==undefined)o[k]=s[k]});return o}
+function valid(d,extra){if(!d||typeof d!=='object'||Array.isArray(d))return false;let ok=false;PUB.forEach(k=>{if(d[k]!=null)ok=true});if(extra&&d.messages!=null)ok=true;if(!ok)return false;if(d.projects&&!Array.isArray(d.projects))return false;if(d.skills&&!Array.isArray(d.skills))return false;if(d.achievements&&!Array.isArray(d.achievements))return false;return true}
+function merge(inc,keys,opt){safety();const n=Object.assign({},DB),c=strip(inc);keys.forEach(k=>{if(c[k]!==undefined)n[k]=c[k]});if(DB.admin)n.admin=DB.admin;DB=n;save(opt)}
+function download(name,obj){const b=new Blob([JSON.stringify(obj,null,2)+'\n'],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),800)}
+function initials(n){return (n||'EL').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()}
+function drawScope(cv){if(!cv)return;const ctx=cv.getContext('2d');let t=0;function loop(){const w=cv.clientWidth,h=cv.clientHeight,dpr=Math.min(devicePixelRatio||1,2);if(cv.width!==w*dpr){cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}ctx.clearRect(0,0,w,h);ctx.strokeStyle='rgba(28,40,54,.8)';ctx.beginPath();for(let i=0;i<4;i++){ctx.moveTo(0,(h/4)*i);ctx.lineTo(w,(h/4)*i)}ctx.stroke();ctx.beginPath();ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--cyan')||'#00e5ff';ctx.lineWidth=1.5;for(let x=0;x<=w;x+=2){const y=h/2-(Math.sin(x*.045+t)*.55+Math.sin(x*.11+t*1.7)*.22)*h*.38;x?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();t+=.08;requestAnimationFrame(loop)}loop()}
+function pcbSVG(){return `<svg viewBox="0 0 100 80" class="pcb-svg" style="width:100%;height:100%;display:block"><rect x="2" y="2" width="96" height="76" fill="none" stroke="#1c2836" stroke-width=".3"/>
+<path d="M18 22 H42 V48 H18" fill="none" stroke="#1c2836" stroke-width=".32"/>
+<path d="M42 48 H62 V28 H90" fill="none" stroke="#22c55e" stroke-width=".4" stroke-dasharray="2 10" style="animation:dashflow 5s linear infinite"/>
+<path d="M42 48 H10 V70" fill="none" stroke="#00e5ff" stroke-width=".35" stroke-dasharray="2 10" style="animation:dashflow 6s linear infinite"/>
+<rect x="38.4" y="44.4" width="7.2" height="7.2" rx=".4" fill="#101820" stroke="#00e5ff" stroke-width=".4"/><text x="42" y="55.8" text-anchor="middle" fill="#00e5ff" font-size="2.1" font-family="Share Tech Mono">MCU</text>
+<rect x="15.3" y="19.3" width="5.4" height="5.4" fill="#101820" stroke="#22c55e" stroke-width=".28"/><text x="18" y="27.2" text-anchor="middle" fill="#8b9bb4" font-size="2" font-family="Share Tech Mono">U1</text>
+<rect x="59.3" y="25.3" width="5.4" height="5.4" fill="#101820" stroke="#22c55e" stroke-width=".28"/><text x="62" y="33.2" text-anchor="middle" fill="#8b9bb4" font-size="2" font-family="Share Tech Mono">U2</text>
+<circle cx="42" cy="48" r=".7" fill="#00e5ff"/></svg>`}
+
+function show(logged){document.getElementById('login').classList.toggle('hidden',logged);document.getElementById('app').classList.toggle('hidden',!logged);if(logged)page('dash')}
+function doLogin(e){e.preventDefault();if(u.value==='admin'&&pw.value==='circuit2026'){sessionStorage.setItem(AUTH,'1');show(true)}else le.textContent='Access denied.';return false}
+function logout(){sessionStorage.removeItem(AUTH);show(false)}
+function page(v){document.querySelectorAll('aside.side button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));const m=document.getElementById('main');
+ if(v==='dash'){m.innerHTML=`<p class="tech" style="color:var(--cyan)">OVERVIEW</p><h2>Command Deck</h2><div class="cards three">
+ <div class="glass" style="padding:16px"><p class="tech">Total Projects</p><div class="stat">${(DB.projects||[]).length}</div></div>
+ <div class="glass" style="padding:16px"><p class="tech">Achievements</p><div class="stat">${(DB.achievements||[]).length}</div></div>
+ <div class="glass" style="padding:16px"><p class="tech">Skills</p><div class="stat">${(DB.skills||[]).length}</div></div>
+ <div class="glass" style="padding:16px"><p class="tech">Messages</p><div class="stat">${(DB.messages||[]).length}</div></div></div>`;}
+ else if(v==='projects'){m.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:end"><div><p class="tech" style="color:var(--cyan)">DATABASE</p><h2>Projects</h2></div><button class="btn p" onclick="editProj(null)">ADD MODULE</button></div>`+(DB.projects||[]).map(x=>`<div class="glass" style="display:flex;gap:12px;align-items:center;padding:12px;margin-top:8px"><img src="${esc(img(x.image))}" style="width:120px;height:72px;object-fit:cover" onerror="this.style.opacity=.2"><div style="flex:1"><b class="display" style="font-size:18px">${esc(x.title)}</b><p class="tech">${esc(x.category)} · ${esc(x.status)} ${x.featured?'· FEATURED':''}</p></div><button class="btn" onclick="feat('${x.id}')">${x.featured?'UNFEATURE':'FEATURE'}</button><button class="btn" onclick="editProj('${x.id}')">EDIT</button><button class="btn" onclick="delProj('${x.id}')">DELETE</button></div>`).join('');}
+ else if(v==='achievements'){m.innerHTML=`<div style="display:flex;justify-content:space-between"><div><p class="tech" style="color:var(--cyan)">TIMELINE</p><h2>Achievements</h2></div><button class="btn p" onclick="addAch()">ADD NODE</button></div>`+(DB.achievements||[]).map(a=>`<div class="glass" style="padding:12px;margin-top:8px;display:flex;justify-content:space-between"><div><b>${esc(a.title)}</b><p class="tech">${esc(a.organization)} · ${esc(a.date)}</p></div><button class="btn" onclick="delAch('${a.id}')">DELETE</button></div>`).join('');}
+ else if(v==='skills'){m.innerHTML=`<p class="tech" style="color:var(--cyan)">ARSENAL</p><h2>Skills</h2><form class="glass" style="padding:16px;display:grid;gap:8px;grid-template-columns:1fr 1fr 80px auto" onsubmit="return addSk(event)"><input class="field" name="name" placeholder="Name" required><select class="field" name="category"><option>Hardware</option><option>Electronics</option><option>Software</option><option>Tools</option></select><input class="field" name="level" type="number" value="80" min="1" max="100"><button class="btn p">ADD</button></form>`+(DB.skills||[]).map(s=>`<div class="glass" style="padding:10px;margin-top:6px;display:flex;justify-content:space-between">${esc(s.name)} · ${s.level}% · ${esc(s.category)} <button class="btn" onclick="delSk('${s.id}')">DEL</button></div>`).join('');}
+ else if(v==='messages'){m.innerHTML=`<p class="tech" style="color:var(--cyan)">INBOX</p><h2>Messages</h2>`+((DB.messages||[]).length?DB.messages.map(x=>`<div class="glass" style="padding:12px;margin-top:8px"><b>${esc(x.subject)}</b><p class="tech">${esc(x.name)} · ${esc(x.email)}</p><p>${esc(x.message)}</p><button class="btn" onclick="delMsg('${x.id}')">DELETE</button></div>`).join(''):'<div class="glass" style="padding:24px" class="tech">NO INCOMING PACKETS</div>');}
+ else if(v==='settings'){const p=DB.profile||{};m.innerHTML=`<p class="tech" style="color:var(--cyan)">IDENTITY</p><h2>Portfolio Settings</h2><form class="glass" style="padding:16px" onsubmit="return saveSet(event)">
+ ${[['name','NAME'],['title','TITLE'],['branch','BRANCH'],['focus','FOCUS'],['location','LOCATION'],['email','EMAIL'],['phone','PHONE'],['github','GITHUB'],['linkedin','LINKEDIN']].map(([k,l])=>`<p class="tech">${l}</p><input class="field" name="${k}" value="${esc(p[k]||'')}">`).join('')}
+ <p class="tech">HEADLINE</p><textarea class="field" name="headline" rows="2">${esc(p.headline||'')}</textarea>
+ <p class="tech">BIO</p><textarea class="field" name="bio" rows="3">${esc(p.bio||'')}</textarea>
+ <p class="tech" style="color:var(--pcb)">Use the SAVE button (top right) to keep these edits after refresh.</p></form>`;}
+ else if(v==='data'){m.innerHTML=`<p class="tech" style="color:var(--cyan)">PUBLISH</p><h2>data.json</h2>
+ <p style="color:var(--mute)">Changes made in this browser are local until you export and publish data.json.</p>
+ <p class="tech">Index.html reads data.json. SAVE keeps edits in this browser so the site preview matches. Download data.json and replace the file to publish.</p>
+ <p><button class="btn p" onclick="saveNow();dlPub()">SAVE + Download data.json</button>
+ <button class="btn" onclick="reloadFile()">Load data.json (reset to file)</button>
+ <button class="btn" onclick="document.getElementById('imp').click()">Import data.json</button>
+ <button class="btn" onclick="dlBak()">Backup All Data</button>
+ <button class="btn" onclick="document.getElementById('rst').click()">Restore Backup</button></p>
+ <p class="msg" id="dn"></p>
+ <input id="imp" type="file" accept="application/json,.json" hidden>
+ <input id="rst" type="file" accept="application/json,.json" hidden>`;
+ document.getElementById('imp').onchange=e=>readF(e.target.files[0],d=>{if(!valid(d)){dn.textContent='Invalid data.json structure.';dn.className='msg bad';return}merge(d,PUB);dn.textContent='Imported. Reloading…';setTimeout(()=>location.reload(),300)},m=>{dn.textContent=m;dn.className='msg bad'});
+ document.getElementById('rst').onchange=e=>readF(e.target.files[0],d=>{if(!valid(d,true)){dn.textContent='Restore failed. Invalid backup file.';dn.className='msg bad';return}if(!confirm('Restore this backup?\n\nYour current portfolio data will be replaced.'))return;merge(d,PUB.concat(['messages']));dn.textContent='Restored. Reloading…';setTimeout(()=>location.reload(),300)},()=>{dn.textContent='Restore failed. Invalid backup file.';dn.className='msg bad'});}
+ bindAutosave();
+}
+
+function bindAutosave(){
+  const f=document.querySelector('#main form');
+  if(!f||!f.elements||!f.elements.headline||f.dataset.bound==='1') return;
+  f.dataset.bound='1';
+  f.addEventListener('input',function(){
+    harvestForms();
+    clearTimeout(bindAutosave._t);
+    bindAutosave._t=setTimeout(function(){ save({quiet:true}); }, 350);
+  });
+}
+function feat(id){const p=DB.projects.find(x=>x.id===id);p.featured=!p.featured;save();page('projects')}
+function delProj(id){if(!confirm('Delete this project module?'))return;DB.projects=DB.projects.filter(p=>p.id!==id);save();page('projects')}
+function delAch(id){DB.achievements=DB.achievements.filter(a=>a.id!==id);save();page('achievements')}
+function delSk(id){DB.skills=DB.skills.filter(s=>s.id!==id);save();page('skills')}
+function delMsg(id){DB.messages=DB.messages.filter(m=>m.id!==id);save();page('messages')}
+function addSk(e){e.preventDefault();const f=e.target;DB.skills.push({id:uid(),name:f.name.value,category:f.category.value,level:Number(f.level.value)||70,description:''});save();page('skills');return false}
+function addAch(){const t=prompt('Title');if(!t)return;DB.achievements.push({id:uid(),title:t,organization:prompt('Organization')||'',date:prompt('Date YYYY-MM')||new Date().toISOString().slice(0,7),description:'',category:'Award',order:DB.achievements.length+1});save();page('achievements')}
+function editProj(id){const x=id?(DB.projects||[]).find(p=>p.id===id):{title:'',description:'',category:'IoT',technologies:[],status:'Completed',liveUrl:'',githubUrl:'',demoUrl:''};
+ const m=document.getElementById('modal');m.className='modal on';
+ m.innerHTML=`<form class="box" style="padding:20px" onsubmit="return saveProj(event,'${id||''}')"><button type="button" class="btn" onclick="document.getElementById('modal').className='modal'">CANCEL</button>
+ <p class="tech">TITLE</p><input class="field" name="title" value="${esc(x.title||'')}" required>
+ <p class="tech">DESCRIPTION</p><textarea class="field" name="description" rows="3">${esc(x.description||'')}</textarea>
+ <p class="tech">CATEGORY</p><input class="field" name="category" value="${esc(x.category||'IoT')}">
+ <p class="tech">TECHNOLOGIES (comma)</p><input class="field" name="technologies" value="${esc((x.technologies||[]).join(', '))}">
+ <p class="tech">STATUS</p><input class="field" name="status" value="${esc(x.status||'Completed')}">
+ <p class="tech">LIVE URL</p><input class="field" name="liveUrl" value="${esc(x.liveUrl||'')}">
+ <p class="tech">GITHUB URL</p><input class="field" name="githubUrl" value="${esc(x.githubUrl||'')}">
+ <p class="tech">DEMO URL</p><input class="field" name="demoUrl" value="${esc(x.demoUrl||'')}">
+ <button class="btn p">SAVE MODULE</button></form>`;
+ const form=m.querySelector('form');
+ if(form){ form.addEventListener('input',function(){ harvestForms(); clearTimeout(editProj._t); editProj._t=setTimeout(function(){ save({quiet:true}); },350); }); }
+}
+function val(f,k){const el=f.elements[k]; return el?el.value:'';}
+function saveProj(e,id){e.preventDefault();const f=e.target,tech=val(f,'technologies').split(',').map(s=>s.trim()).filter(Boolean);
+ const patch={title:val(f,'title'),description:val(f,'description'),category:val(f,'category')||'IoT',technologies:tech,status:val(f,'status')||'Completed',liveUrl:val(f,'liveUrl'),githubUrl:val(f,'githubUrl'),demoUrl:val(f,'demoUrl')};
+ if(id){const i=DB.projects.findIndex(p=>p.id===id); if(i>=0) DB.projects[i]=Object.assign({},DB.projects[i],patch);}
+ else DB.projects.push(Object.assign({id:uid(),fullDescription:patch.description,image:'',featured:false,date:new Date().toISOString().slice(0,7),order:(DB.projects||[]).length+1},patch));
+ save();document.getElementById('modal').className='modal';page('projects');return false}
+function saveSet(e){if(e&&e.preventDefault)e.preventDefault();const f=e.target;const g=k=>f.elements[k]?f.elements[k].value:'';DB.profile=Object.assign({},DB.profile,{name:g('name'),title:g('title'),branch:g('branch'),focus:g('focus'),location:g('location'),email:g('email'),phone:g('phone'),github:g('github'),linkedin:g('linkedin'),headline:g('headline'),bio:g('bio')});save();return false}
+function reloadFile(){
+  fetch(new URL('data.json',document.baseURI)).then(r=>r.ok?r.json():null).then(d=>{
+    if(!d||!valid(d)){ pingSaved(false); alert('Could not read data.json'); return; }
+    try{ localStorage.removeItem('ece_lab_dirty'); }catch(e){}
+    DB=Object.assign({messages: DB.messages||[]}, seed());
+    applyFile(d);
+    save({stamp:false, quiet:true});
+    try{ localStorage.removeItem('ece_lab_dirty'); }catch(e){}
+    pingSaved(true);
+    page('data');
+    const n=document.getElementById('dn'); if(n){ n.textContent='Loaded data.json. Index will show this file.'; n.className='msg'; }
+  }).catch(()=>alert('Could not read data.json'));
+}
+function dlPub(){download('data.json',pick(PUB));dn&& (dn.textContent='Downloaded data.json. Replace the repo file and push to publish.')}
+function dlBak(){const p=pick(PUB.concat(['messages']));p.kind='electro-backup';p.exportedAt=new Date().toISOString();const d=new Date();download(`electro-backup-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}-${String(d.getHours()).padStart(2,'0')}-${String(d.getMinutes()).padStart(2,'0')}-${String(d.getSeconds()).padStart(2,'0')}.json`,p)}
+function readF(file,ok,fail){if(!file){fail('Cancelled.');return}const r=new FileReader();r.onerror=()=>fail('Could not read file.');r.onload=()=>{try{ok(JSON.parse(String(r.result||'')))}catch(e){fail('Invalid JSON.')}};r.readAsText(file)}
+
+function applyFile(d){
+  if(!d||!valid(d)) return false;
+  const keep=DB.messages||[];
+  const c=strip(d);
+  PUB.forEach(k=>{ if(c[k]!==undefined) DB[k]=c[k]; });
+  DB.messages=keep;
+  return true;
+}
+function applyLocal(){
+  try{
+    const r=localStorage.getItem(KEY);
+    if(!r) return false;
+    const parsed=JSON.parse(r);
+    ['profile','settings','stats','projects','achievements','skills','messages'].forEach(k=>{ if(parsed[k]!==undefined) DB[k]=parsed[k]; });
+    return true;
+  }catch(e){ return false; }
+}
+function bootAdmin(){
+  DB=Object.assign({messages:[]}, seed());
+  const dirty=(()=>{try{return localStorage.getItem('ece_lab_dirty')==='1'}catch(e){return false}})();
+  const finish=()=>{ if(dirty) applyLocal(); show(sessionStorage.getItem(AUTH)==='1'); };
+  fetch(new URL('data.json', document.baseURI)).then(r=>r.ok?r.json():null).then(d=>{
+    applyFile(d);
+    finish();
+  }).catch(finish);
+}
+bootAdmin();
+
+</script>
+</body></html>
