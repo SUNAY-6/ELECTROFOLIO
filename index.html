@@ -4,8 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <meta name="theme-color" content="#05070a"/>
-<meta name="description" content="Portfolio of Aditya Varma, Electronics & Communication engineer building embedded systems, IoT products, and hardware-software platforms."/>
-<title>Aditya Varma — ECE Engineer</title>
+<meta name="description" content="Portfolio of SUNAY, Electronics & Communication engineer building embedded systems, IoT products, and hardware-software platforms."/>
+<title>SUNAY — Electronic Engineer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
 <style>
@@ -285,24 +285,24 @@ footer.ft .run{position:absolute;inset:0 0 auto 0;height:1px;opacity:.7}
 <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
 <script type="application/json" id="SEED">{
   "profile": {
-    "name": "Aditya Varma",
-    "title": "ECE Engineer",
+    "name": "SUNAY",
+    "title": "Electronic Engineer",
     "headline": "BUILDING THE FUTURE\nONE CIRCUIT AT A TIME.",
     "tagline": "Embedded systems · IoT · hardware-software co-design",
     "bio": "Electronics and Communication engineer who treats every board like a story — power rails, signal integrity, firmware, and the interface a human actually touches. I design, prototype, and ship systems that live between silicon and the physical world.",
     "longBio": "I work at the intersection of analog sensing, embedded firmware, and product software. From ESP32 field nodes to Raspberry Pi vision stacks, I care about clean schematics, stable power, readable C, and interfaces that feel inevitable. Currently focused on low-power IoT, PCB-first product design, and systems that can survive outside a lab bench.",
     "branch": "Electronics & Communication Engineering",
-    "education": "B.Tech ECE · VRSEC, Vijayawada",
-    "educationDetail": "Velagapudi Ramakrishna Siddhartha Engineering College",
-    "location": "Vijayawada, Andhra Pradesh",
+    "education": "B.Tech CSE · STDN, Puttur",
+    "educationDetail": "Siddharth Instute Of Engineering And TEchnology, Puttur, Andhra Pradesh (2022-2026)",
+    "location": "Putur, Andhra Pradesh",
     "focus": "Embedded Systems",
     "interest": "IoT · PCB Design · Signal Processing",
     "experience": "Internships · Hardware builds · Research projects",
     "status": "Building",
     "availability": "Open to internships & collaborations",
-    "email": "aditya.varma@example.com",
+    "email": "sunayp16@gmail.com",
     "phone": "+91 98765 43210",
-    "github": "https://github.com/adityavarma",
+    "github": "https://github.com/sunay-6",
     "linkedin": "https://linkedin.com/in/adityavarma",
     "instagram": "https://instagram.com/aditya.circuits",
     "resumeUrl": "/resume.html",
@@ -315,8 +315,8 @@ footer.ft .run{position:absolute;inset:0 0 auto 0;height:1px;opacity:.7}
     }
   },
   "settings": {
-    "siteTitle": "Aditya Varma — ECE Engineer",
-    "siteDescription": "Portfolio of Aditya Varma, Electronics & Communication engineer building embedded systems, IoT products, and hardware-software platforms.",
+    "siteTitle": "SUNAY — Electronic Engineer",
+    "siteDescription": "Portfolio of SUNAY, Electronics & Communication engineer building embedded systems, IoT products, and hardware-software platforms.",
     "lastUpdated": "2026-08-19"
   },
   "stats": {
@@ -920,15 +920,23 @@ const pcb={auto:'MCU',hot:null,locked:false,mouse:{x:50,y:50},mounted:false,time
 
 function seed(){try{return JSON.parse(document.getElementById('SEED').textContent)}catch(e){return {profile:{},settings:{},stats:{},projects:[],achievements:[],skills:[],messages:[]}}}
 function strip(v){if(Array.isArray(v))return v.map(strip);if(v&&typeof v==='object'){const o={};Object.keys(v).forEach(k=>{if(!SECRET.test(k)&&k!=='admin')o[k]=strip(v[k])});return o}return v}
-function load(){try{const r=localStorage.getItem(KEY);if(r){DB=Object.assign({messages:[]},seed(),JSON.parse(r));return}}catch(e){}DB=Object.assign({messages:[]},seed());}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
+function load(){DB=Object.assign({messages:[]},seed());}
+function save(){
+  /* index never overwrites admin portfolio data; only appends contact messages */
+  try{
+    let local={};
+    try{ local=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(e){ local={}; }
+    local.messages=DB.messages||[];
+    localStorage.setItem(KEY, JSON.stringify(local.messages!=null?Object.assign({},local,{messages:local.messages}):local));
+  }catch(e){}
+}
 function safety(){try{const c=localStorage.getItem(KEY);if(c)localStorage.setItem(SAFETY,c)}catch(e){}}
 function img(s){if(!s)return '';s=String(s);if(/^https?:|data:/.test(s))return s;return s.replace(/^\//,'')}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function uid(){return 'id-'+Date.now()+'-'+Math.floor(Math.random()*1e6)}
 function pick(keys){const s=strip(DB),o={};keys.forEach(k=>{if(s[k]!==undefined)o[k]=s[k]});return o}
 function valid(d,extra){if(!d||typeof d!=='object'||Array.isArray(d))return false;let ok=false;PUB.forEach(k=>{if(d[k]!=null)ok=true});if(extra&&d.messages!=null)ok=true;if(!ok)return false;if(d.projects&&!Array.isArray(d.projects))return false;if(d.skills&&!Array.isArray(d.skills))return false;if(d.achievements&&!Array.isArray(d.achievements))return false;return true}
-function merge(inc,keys){safety();const n=Object.assign({},DB),c=strip(inc);keys.forEach(k=>{if(c[k]!==undefined)n[k]=c[k]});if(DB.admin)n.admin=DB.admin;DB=n;save()}
+function merge(inc,keys){const n=Object.assign({},DB),c=strip(inc);keys.forEach(k=>{if(c[k]!==undefined)n[k]=c[k]});DB=n;}
 function initials(n){return (n||'EL').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()}
 function formatMonth(v){if(!v)return '';const [y,m]=String(v).split('-');if(!m)return y;return (MONTHS[Number(m)-1]||m)+' '+y}
 function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
@@ -1514,35 +1522,17 @@ load();
 cursor(); meter(); parallax(); spy();
 (function startSite(){
   const go=()=>{renderAll(); boot();};
-  const dirty=(()=>{try{return localStorage.getItem('ece_lab_dirty')==='1'}catch(e){return false}})();
-  fetch(new URL('data.json',document.baseURI)).then(r=>r.ok?r.json():null).then(d=>{
+  const url=new URL('data.json', document.baseURI);
+  url.searchParams.set('v', String(Date.now()));
+  fetch(url, {cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
+    DB=Object.assign({messages:[]}, seed());
     if(d&&valid(d)){
-      const msg=DB.messages;
       const c=strip(d);
       PUB.forEach(k=>{ if(c[k]!==undefined) DB[k]=c[k]; });
-      DB.messages=msg;
-      if(!dirty){ try{ localStorage.setItem(KEY, JSON.stringify(DB)); }catch(e){} }
-    }
-    if(dirty){
-      try{
-        const r=localStorage.getItem(KEY);
-        if(r){
-          const parsed=JSON.parse(r);
-          PUB.concat(['messages']).forEach(k=>{ if(parsed[k]!==undefined) DB[k]=parsed[k]; });
-        }
-      }catch(e){}
     }
     go();
   }).catch(()=>{
-    if(dirty){
-      try{
-        const r=localStorage.getItem(KEY);
-        if(r){
-          const parsed=JSON.parse(r);
-          PUB.concat(['messages']).forEach(k=>{ if(parsed[k]!==undefined) DB[k]=parsed[k]; });
-        }
-      }catch(e){}
-    }
+    DB=Object.assign({messages:[]}, seed());
     go();
   });
 })();
