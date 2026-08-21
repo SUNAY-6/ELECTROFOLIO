@@ -139,38 +139,6 @@
       "order": 3
     },
     {
-      "id": "p4",
-      "title": "Smart Attendance System",
-      "description": "RFID attendance with anti-proxy rules, CSV export, and a faculty console.",
-      "fullDescription": "MFRC522 + ESP32 attendance kiosk that writes logs locally and syncs when the network is up.",
-      "problem": "Paper attendance was trivial to spoof.",
-      "solution": "Card tap, timestamped logs, and an offline queue.",
-      "category": "Embedded",
-      "technologies": [
-        "ESP32",
-        "RFID",
-        "C++"
-      ],
-      "hardware": [
-        "ESP32",
-        "MFRC522",
-        "LCD"
-      ],
-      "features": [
-        "RFID tap",
-        "Anti-proxy window",
-        "CSV export"
-      ],
-      "image": "/images/projects/attendance.jpg",
-      "liveUrl": "",
-      "demoUrl": "",
-      "githubUrl": "https://github.com/adityavarma/smart-attendance",
-      "featured": false,
-      "status": "Completed",
-      "date": "2025-03",
-      "order": 4
-    },
-    {
       "id": "p5",
       "title": "Line Following Robot",
       "description": "PID line follower with a calibrated IR array and tunable control from a serial console.",
@@ -202,38 +170,6 @@
       "status": "Completed",
       "date": "2024-12",
       "order": 5
-    },
-    {
-      "id": "p6",
-      "title": "Palm Vein Scanner",
-      "description": "Near-infrared palm-vein capture rig exploring contactless biometric authentication.",
-      "fullDescription": "A research prototype that illuminates the palm with NIR LEDs and captures vein patterns.",
-      "problem": "Fingerprint kiosks fail with dust and hygiene concerns.",
-      "solution": "Contactless NIR imaging and a vein-contrast pipeline.",
-      "category": "AI",
-      "technologies": [
-        "Raspberry Pi",
-        "Python",
-        "OpenCV"
-      ],
-      "hardware": [
-        "Raspberry Pi 4",
-        "NoIR camera",
-        "850nm LEDs"
-      ],
-      "features": [
-        "NIR illumination",
-        "Palm guidance",
-        "Template match"
-      ],
-      "image": "/images/projects/palm-vein.jpg",
-      "liveUrl": "",
-      "demoUrl": "",
-      "githubUrl": "https://github.com/adityavarma/palm-vein",
-      "featured": true,
-      "status": "In Progress",
-      "date": "2026-04",
-      "order": 6
     },
     {
       "id": "p7",
@@ -302,39 +238,6 @@
       "order": 8
     },
     {
-      "id": "p9",
-      "title": "PCB Sensor Network",
-      "description": "Mesh of identical sensor nodes sharing temperature, light, and battery over ESP-NOW.",
-      "fullDescription": "A family of postage-stamp PCBs that wake, sample, and gossip state over ESP-NOW.",
-      "problem": "Breadboard wireless demos never survived more than an afternoon.",
-      "solution": "A single 2-layer node PCB and a simple send window.",
-      "category": "Hardware",
-      "technologies": [
-        "ESP32",
-        "ESP-NOW",
-        "KiCad",
-        "C"
-      ],
-      "hardware": [
-        "ESP32-C3",
-        "SHT30",
-        "Custom PCB"
-      ],
-      "features": [
-        "ESP-NOW mesh",
-        "Battery telemetry",
-        "Fab-ready gerbers"
-      ],
-      "image": "/images/projects/sensor-network.jpg",
-      "liveUrl": "",
-      "demoUrl": "",
-      "githubUrl": "https://github.com/adityavarma/pcb-sensor-net",
-      "featured": false,
-      "status": "Completed",
-      "date": "2025-09",
-      "order": 9
-    },
-    {
       "id": "p10",
       "title": "Smart Agriculture System",
       "description": "Soil-aware irrigation controller with moisture probes, pump logic, and solar headroom.",
@@ -366,22 +269,6 @@
       "status": "Completed",
       "date": "2024-10",
       "order": 10
-    },
-    {
-      "id": "id-1787254513691-709633",
-      "title": "SDFGCHJK",
-      "description": "DSAFXCGNJKML,",
-      "fullDescription": "DSAFXCGNJKML,",
-      "category": "IoT",
-      "technologies": [],
-      "status": "Completed",
-      "liveUrl": "",
-      "githubUrl": "",
-      "demoUrl": "",
-      "image": "",
-      "featured": false,
-      "date": "2026-08",
-      "order": 11
     }
   ],
   "achievements": [
