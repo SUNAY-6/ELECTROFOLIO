@@ -237,7 +237,8 @@ footer.ft .run{position:absolute;inset:0 0 auto 0;height:1px;opacity:.7}
     <div>
       <p class="tech rise" style="color:var(--pcb)" id="h-loc"></p>
       <p class="tech rise" style="color:var(--cyan);margin-top:12px;animation-delay:.08s" id="h-title"></p>
-      <h1 class="text-glow display" id="h-head"></h1>
+      <h1 class="text-glow display" id="h-name"></h1>
+      <p class="text-glow display" id="h-head" style="font-size:clamp(22px,4.2vw,40px);line-height:1.05;margin:10px 0 0;letter-spacing:.04em"></p>
       <p class="rise" style="color:var(--mute);max-width:36rem;line-height:1.6;animation-delay:.55s" id="h-bio"></p>
       <div id="h-tags" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px"></div>
       <div style="margin-top:28px;display:flex;flex-wrap:wrap;gap:10px">
@@ -919,7 +920,7 @@ const pcb={auto:'MCU',hot:null,locked:false,mouse:{x:50,y:50},mounted:false,time
 
 function seed(){try{return JSON.parse(document.getElementById('SEED').textContent)}catch(e){return {profile:{},settings:{},stats:{},projects:[],achievements:[],skills:[],messages:[]}}}
 function strip(v){if(Array.isArray(v))return v.map(strip);if(v&&typeof v==='object'){const o={};Object.keys(v).forEach(k=>{if(!SECRET.test(k)&&k!=='admin')o[k]=strip(v[k])});return o}return v}
-function load(){try{const r=localStorage.getItem(KEY);if(r){DB=Object.assign({messages:[]},seed(),JSON.parse(r));return}}catch(e){}DB=Object.assign({messages:[]},seed());save()}
+function load(){try{const r=localStorage.getItem(KEY);if(r){DB=Object.assign({messages:[]},seed(),JSON.parse(r));return}}catch(e){}DB=Object.assign({messages:[]},seed());}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
 function safety(){try{const c=localStorage.getItem(KEY);if(c)localStorage.setItem(SAFETY,c)}catch(e){}}
 function img(s){if(!s)return '';s=String(s);if(/^https?:|data:/.test(s))return s;return s.replace(/^\//,'')}
@@ -1134,9 +1135,14 @@ function countUp(el,n){
   requestAnimationFrame(tick);
 }
 
+function setName(text){
+  const el=document.getElementById('h-name'); if(!el) return;
+  const words=String(text||'').trim().split(/\s+/).filter(Boolean);
+  el.innerHTML='<span style="display:block;overflow:hidden">'+words.map((w,i)=>`<span class="word" style="animation-delay:${0.12+i*0.08}s">${esc(w)}</span>`).join(' ')+'</span>';
+}
 function setHeadline(text){
   const el=document.getElementById('h-head');
-  el.innerHTML=String(text||'').split('\n').map((line,li)=>'<span style="display:block;overflow:hidden">'+line.split(' ').map((w,wi)=>`<span class="word" style="animation-delay:${0.16+li*0.18+wi*0.06}s">${esc(w)}</span>`).join(' ')+'</span>').join('');
+  el.innerHTML=String(text||'').split('\n').map((line,li)=>'<span style="display:block;overflow:hidden">'+line.split(' ').map((w,wi)=>`<span class="word" style="animation-delay:${0.42+li*0.18+wi*0.06}s">${esc(w)}</span>`).join(' ')+'</span>').join('');
 }
 
 function skipSplash(){try{sessionStorage.setItem('ece_booted','1')}catch(e){} const s=document.getElementById('splash'); if(!s)return; s.classList.add('out'); setTimeout(()=>s.classList.add('hidden'),520)}
@@ -1157,7 +1163,7 @@ function boot(){
 
 function nav(){
   document.getElementById('nav-links').innerHTML=LINKS.map(([id,l])=>`<a href="#${id}" data-nav="${id}">${l}</a>`).join('');
-  document.getElementById('mobile-menu').innerHTML=LINKS.map(([id,l])=>`<a href="#${id}" onclick="go('${id}');return false">${l}</a>`).join('')+'<a href="admin.html">ADMIN</a>';
+  document.getElementById('mobile-menu').innerHTML=LINKS.map(([id,l])=>`<a href="#${id}" onclick="go('${id}');return false">${l}</a>`).join('');
 }
 function spy(){
   const ids=LINKS.map(x=>x[0]);
@@ -1218,6 +1224,7 @@ function renderHero(){
   document.getElementById('nav-name').textContent=p.name||'ECE LAB';
   document.getElementById('h-loc').textContent=(p.branch||'')+' · '+(p.location||'');
   document.getElementById('h-title').innerHTML=esc((p.title||'').toUpperCase())+'<span class="caret"></span>';
+  setName(p.name||'');
   setHeadline(p.headline||'');
   document.getElementById('h-bio').textContent=p.bio||'';
   document.getElementById('h-tags').innerHTML=(p.tagline||'').split('·').map((s,i)=>`<span class="chip" style="animation-delay:${.7+i*.08}s">${esc(s.trim())}</span>`).join(' ');
@@ -1480,7 +1487,7 @@ function renderFooter(){
         ${socials.map(([lab,h,svg])=>`<a href="${esc(h)}" target="_blank" rel="noreferrer" aria-label="${lab}" title="${lab}">${svg}</a>`).join('')}
       </div>
     </div>
-    <p class="tech" style="margin-top:24px">BUILT AS A HARDWARE-INSPIRED INTERFACE · © ${new Date().getFullYear()} <a href="./admin.html" style="margin-left:12px">ADMIN</a></p>`;
+    <p class="tech" style="margin-top:24px">BUILT AS A HARDWARE-INSPIRED INTERFACE · © ${new Date().getFullYear()}</p>`;
   drawScope(document.getElementById('ft-scope'));
 }
 
@@ -1506,13 +1513,38 @@ initTheme();
 load();
 cursor(); meter(); parallax(); spy();
 (function startSite(){
-  const dirty=(()=>{try{return localStorage.getItem('ece_lab_dirty')==='1'}catch(e){return false}})();
   const go=()=>{renderAll(); boot();};
-  if(dirty){ go(); return; }
+  const dirty=(()=>{try{return localStorage.getItem('ece_lab_dirty')==='1'}catch(e){return false}})();
   fetch(new URL('data.json',document.baseURI)).then(r=>r.ok?r.json():null).then(d=>{
-    if(d&&valid(d)){const msg=DB.messages;merge(d,PUB);DB.messages=msg;save()}
+    if(d&&valid(d)){
+      const msg=DB.messages;
+      const c=strip(d);
+      PUB.forEach(k=>{ if(c[k]!==undefined) DB[k]=c[k]; });
+      DB.messages=msg;
+      if(!dirty){ try{ localStorage.setItem(KEY, JSON.stringify(DB)); }catch(e){} }
+    }
+    if(dirty){
+      try{
+        const r=localStorage.getItem(KEY);
+        if(r){
+          const parsed=JSON.parse(r);
+          PUB.concat(['messages']).forEach(k=>{ if(parsed[k]!==undefined) DB[k]=parsed[k]; });
+        }
+      }catch(e){}
+    }
     go();
-  }).catch(go);
+  }).catch(()=>{
+    if(dirty){
+      try{
+        const r=localStorage.getItem(KEY);
+        if(r){
+          const parsed=JSON.parse(r);
+          PUB.concat(['messages']).forEach(k=>{ if(parsed[k]!==undefined) DB[k]=parsed[k]; });
+        }
+      }catch(e){}
+    }
+    go();
+  });
 })();
 
 </script>
