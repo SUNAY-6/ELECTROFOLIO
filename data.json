@@ -1,15 +1,15 @@
 {
   "profile": {
-    "name": "Aditya Varma",
-    "title": "ECE Engineer",
+    "name": "SUNAY",
+    "title": "Electronic Engineer",
     "headline": "BUILDING THE FUTURE\nONE CIRCUIT AT A TIME.",
     "tagline": "Embedded systems · IoT · hardware-software co-design",
     "bio": "Electronics and Communication engineer who treats every board like a story — power rails, signal integrity, firmware, and the interface a human actually touches. I design, prototype, and ship systems that live between silicon and the physical world.",
     "longBio": "I work at the intersection of analog sensing, embedded firmware, and product software. From ESP32 field nodes to Raspberry Pi vision stacks, I care about clean schematics, stable power, readable C, and interfaces that feel inevitable. Currently focused on low-power IoT, PCB-first product design, and systems that can survive outside a lab bench.",
-    "branch": "Electronics & Communication Engineering",
-    "education": "B.Tech ECE · VRSEC, Vijayawada",
-    "educationDetail": "Velagapudi Ramakrishna Siddhartha Engineering College",
-    "location": "Vijayawada, Andhra Pradesh",
+    "branch": "(CSE) including cyber security and IOT",
+    "education": "B.Tech CSE · STDN, puttur",
+    "educationDetail": " Siddharth instute of engineering and technologgy",
+    "location": "puttur, Andhra Pradesh",
     "focus": "Embedded Systems",
     "interest": "IoT · PCB Design · Signal Processing",
     "experience": "Internships · Hardware builds · Research projects",
@@ -17,9 +17,9 @@
     "availability": "Open to internships & collaborations",
     "email": "aditya.varma@example.com",
     "phone": "+91 98765 43210",
-    "github": "https://github.com/adityavarma",
+    "github": "https://github.com/sunay-6",
     "linkedin": "https://linkedin.com/in/adityavarma",
-    "instagram": "https://instagram.com/aditya.circuits",
+    "instagram": "https://instagram.com/",
     "resumeUrl": "/resume.html",
     "image": "/images/profile.jpg",
     "stats": {
@@ -30,8 +30,8 @@
     }
   },
   "settings": {
-    "siteTitle": "Aditya Varma — ECE Engineer",
-    "siteDescription": "Portfolio of Aditya Varma, Electronics & Communication engineer building embedded systems, IoT products, and hardware-software platforms.",
+    "siteTitle": "SUNAY — Electronic Engineer",
+    "siteDescription": "Portfolio of SUNAY, Electronics & Communication engineer building embedded systems, IoT products, and hardware-software platforms.",
     "lastUpdated": "2026-08-19"
   },
   "stats": {
